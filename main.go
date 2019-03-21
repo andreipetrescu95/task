@@ -14,8 +14,13 @@
 
 package main
 
-import "gophercises/task/cmd"
+import (
+	"gophercises/task/cmd"
+)
 
 func main() {
 	cmd.Execute()
+
+	db := cmd.GetDB()
+	db.Close()
 }

@@ -16,12 +16,14 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
+	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
+var db *bolt.DB
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -49,4 +51,17 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize()
+
+	var err error
+
+	db, err = bolt.Open("tasks.db", 0600, nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+// Returns a pointer to the current BoltDB connection so we can reuse it.
+func GetDB() *bolt.DB {
+	return db
 }

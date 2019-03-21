@@ -15,8 +15,10 @@
 package cmd
 
 import (
-	"fmt"
+	"strconv"
+	"strings"
 
+	"github.com/boltdb/bolt"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +33,25 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
+		db := GetDB()
+
+		db.Update(func(tx *bolt.Tx) error {
+			b, err := tx.CreateBucketIfNotExists([]byte("task"))
+
+			if err != nil {
+				panic(err)
+			}
+
+			err = b.Put([]byte(strconv.Itoa(int(b.Sequence()))), []byte(strings.Join(args, " ")))
+
+			if err != nil {
+				panic(err)
+			}
+
+			_, err = b.NextSequence()
+
+			return err
+		})
 	},
 }
 
